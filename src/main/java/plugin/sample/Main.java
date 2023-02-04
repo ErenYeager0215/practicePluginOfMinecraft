@@ -86,7 +86,7 @@ public final class Main extends JavaPlugin implements Listener {
     ItemStack[] itemStacks = player.getInventory().getContents();
     Arrays.stream(itemStacks).filter(
             item -> !Objects.isNull(item) && item.getMaxStackSize() == 64 && item.getAmount() < 64)
-        .forEach(item -> item.setAmount(64));
+        .forEach(item -> item.setAmount(32));
     player.getInventory().setContents(itemStacks);
   }
 }
