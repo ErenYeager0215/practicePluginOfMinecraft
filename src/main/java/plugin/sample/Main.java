@@ -38,46 +38,36 @@ public final class Main extends JavaPlugin implements Listener {
     Player player = e.getPlayer();
     World world = player.getWorld();
 
-//    しゃがむ動作回数が素数の時だけ花火を出す
-    if (count < 2) {
-      count++;
-      return;
-    }
+    if (count % 2 == 0) {
 
-    for (int i = 2; i < count; i++) {
-      if (count % i == 0) {
+      List<Color> colors = List.of(Color.BLUE, Color.RED, Color.GREEN, Color.BLACK);
+      for (Color color : colors) {
+
+        // 花火オブジェクトをプレイヤーのロケーション地点に対して出現させる。
+        Firework firework = world.spawn(player.getLocation(), Firework.class);
+
+        // 花火オブジェクトが持つメタ情報を取得。
+        FireworkMeta fireworkMeta = firework.getFireworkMeta();
+
+        // メタ情報に対して設定を追加したり、値の上書きを行う。
+        // 今回は青色で星型の花火を打ち上げる。
+        fireworkMeta.addEffect(
+            FireworkEffect.builder()
+                .withColor(color)
+                .with(Type.BURST)
+                .withFlicker()
+                .build());
+        fireworkMeta.setPower(3);
+
+        // 追加した情報で再設定する。
+        firework.setFireworkMeta(fireworkMeta);
         count++;
-        return;
       }
-    }
-
-    List<Color> colors = List.of(Color.BLUE, Color.RED, Color.GREEN, Color.BLACK);
-    for (Color color : colors) {
-
-      // 花火オブジェクトをプレイヤーのロケーション地点に対して出現させる。
-      Firework firework = world.spawn(player.getLocation(), Firework.class);
-
-      // 花火オブジェクトが持つメタ情報を取得。
-      FireworkMeta fireworkMeta = firework.getFireworkMeta();
-
-      // メタ情報に対して設定を追加したり、値の上書きを行う。
-      // 今回は青色で星型の花火を打ち上げる。
-      fireworkMeta.addEffect(
-          FireworkEffect.builder()
-              .withColor(color)
-              .with(Type.BURST)
-              .withFlicker()
-              .build());
-      fireworkMeta.setPower(3);
-
-      // 追加した情報で再設定する。
-      firework.setFireworkMeta(fireworkMeta);
-      count++;
-    }
 //    supigotServerと同じ階層にファイルを生成する
-    Path path = Path.of("firework.txt");
-    Files.writeString(path, "yahoo", StandardOpenOption.APPEND);
-    player.sendMessage(Files.readString(path));
+      Path path = Path.of("firework.txt");
+      Files.writeString(path, "yahoo", StandardOpenOption.APPEND);
+      player.sendMessage(Files.readString(path));
+    }
   }
 
   @EventHandler
@@ -86,7 +76,7 @@ public final class Main extends JavaPlugin implements Listener {
     ItemStack[] itemStacks = player.getInventory().getContents();
     Arrays.stream(itemStacks).filter(
             item -> !Objects.isNull(item) && item.getMaxStackSize() == 64 && item.getAmount() < 64)
-        .forEach(item -> item.setAmount(64));
+        .forEach(item -> item.setAmount(32));
     player.getInventory().setContents(itemStacks);
   }
 }
